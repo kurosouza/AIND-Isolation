@@ -170,6 +170,22 @@ class MinimaxPlayer(IsolationPlayer):
         # Return the best move from the last completed search iteration
         return best_move
 
+    def game_has_ended(self, game):
+        """ Utility function to determine of a game has ended (by checking if one player has lost) """
+        player1 = game.active_player
+        return game.is_loser(player1) or game.is_winner(player1)
+        
+
+    def minimax_full(self, game):
+        """ Default full minimax search (without any depth limit)
+        Parameters
+        ----------
+        game: Game object representing current state of board
+        """
+        #def max_value(game):
+        #    if game.
+        pass
+
     def minimax(self, game, depth):
         """Implement depth-limited minimax search algorithm as described in
         the lectures.
@@ -209,11 +225,33 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
+        infinity = float("inf")
+        
+        def max_value(game):
+            if game.is_loser(self) or game.is_winner(self):
+                return game.utility(self)
+            v = -infinity
+            for move in game.get_legal_moves(self):
+                v = max(v, game.utility(min_value(self.score(move))))
+            return v
+        
+        def min_value(game):
+            if game.is_loser(self) or game.is_winner(self):
+                return game.utility(self)
+            v = infinity
+            for move in game.get_legal_moves(self):
+                v = min(v, max_value(self.score(game.forecast_move(move))))
+            return v
+        
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
+        legal_moves = game.get_legal_moves()
+        
+        return legal_moves[0]
+        
         # TODO: finish this function!
-        raise NotImplementedError
+        # raise NotImplementedError
 
 
 class AlphaBetaPlayer(IsolationPlayer):
