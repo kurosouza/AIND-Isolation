@@ -227,28 +227,30 @@ class MinimaxPlayer(IsolationPlayer):
         """
         infinity = float("inf")
         
-        def max_value(game):
-            if game.is_loser(self) or game.is_winner(self):
-                return game.utility(self)
+        def max_value(state):
+            if state.is_loser(self) or state.is_winner(self):
+                return self.score(state,self)
             v = -infinity
-            for move in game.get_legal_moves(self):
-                v = max(v, game.utility(min_value(self.score(move))))
+            for move in state.get_legal_moves(self):
+                v = max(v, min_value(state.forecast_move(move)))
             return v
         
-        def min_value(game):
-            if game.is_loser(self) or game.is_winner(self):
-                return game.utility(self)
+        def min_value(state):
+            if state.is_loser(self) or state.is_winner(self):
+                return self.score(state,self)
             v = infinity
-            for move in game.get_legal_moves(self):
-                v = min(v, max_value(self.score(game.forecast_move(move))))
+            for move in state.get_legal_moves(self):
+                v = min(v, max_value(state.forecast_move(move)))
             return v
         
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        legal_moves = game.get_legal_moves()
+        legal_moves = game.get_legal_moves(self)
         
-        return legal_moves[0]
+        return max(legal_moves, key = lambda a : min_value(game))
+        
+        # return legal_moves[0]
         
         # TODO: finish this function!
         # raise NotImplementedError
