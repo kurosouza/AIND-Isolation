@@ -248,7 +248,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         legal_moves = game.get_legal_moves(self)
         
-        return max(legal_moves, key = lambda a : min_value(game))
+        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a)))
         
         # return legal_moves[0]
         
