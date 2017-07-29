@@ -227,20 +227,20 @@ class MinimaxPlayer(IsolationPlayer):
         """
         infinity = float("inf")
         
-        def max_value(state):
-            if state.is_loser(self) or state.is_winner(self):
+        def max_value(state, depth):
+            if state.is_loser(self) or state.is_winner(self) or depth < 1:
                 return self.score(state,self)
             v = -infinity
             for move in state.get_legal_moves(self):
-                v = max(v, min_value(state.forecast_move(move)))
+                v = max(v, min_value(state.forecast_move(move), depth - 1))
             return v
         
-        def min_value(state):
-            if state.is_loser(self) or state.is_winner(self):
+        def min_value(state, depth):
+            if state.is_loser(self) or state.is_winner(self) or depth < 1:
                 return self.score(state,self)
             v = infinity
             for move in state.get_legal_moves(self):
-                v = min(v, max_value(state.forecast_move(move)))
+                v = min(v, max_value(state.forecast_move(move), depth - 1))
             return v
         
         if self.time_left() < self.TIMER_THRESHOLD:
@@ -248,7 +248,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         legal_moves = game.get_legal_moves(self)
         
-        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a)))
+        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth))
         
         # return legal_moves[0]
         
