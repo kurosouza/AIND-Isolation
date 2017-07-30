@@ -35,7 +35,14 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    # raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    return float(len(game.get_legal_moves(player)))
 
 
 def custom_score_2(game, player):
@@ -182,8 +189,7 @@ class MinimaxPlayer(IsolationPlayer):
         ----------
         game: Game object representing current state of board
         """
-        #def max_value(game):
-        #    if game.
+        
         pass
 
     def minimax(self, game, depth):
@@ -227,17 +233,28 @@ class MinimaxPlayer(IsolationPlayer):
         """
         infinity = float("inf")
         
+        if len(game.get_legal_moves(self)) == 0 or depth == 0:
+                return (-1,-1)
+        
         def max_value(state, depth):
-            if state.is_loser(self) or state.is_winner(self) or depth < 1:
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+            
+            if len(state.get_legal_moves(self)) == 0 or depth < 1:
                 return self.score(state,self)
+            
             v = -infinity
             for move in state.get_legal_moves(self):
                 v = max(v, min_value(state.forecast_move(move), depth - 1))
             return v
         
         def min_value(state, depth):
-            if state.is_loser(self) or state.is_winner(self) or depth < 1:
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+            
+            if len(state.get_legal_moves(self)) == 0 or depth < 1:
                 return self.score(state,self)
+            
             v = infinity
             for move in state.get_legal_moves(self):
                 v = min(v, max_value(state.forecast_move(move), depth - 1))
@@ -248,7 +265,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         legal_moves = game.get_legal_moves(self)
         
-        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth))
+        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth - 1))
         
         # return legal_moves[0]
         
