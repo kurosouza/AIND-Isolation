@@ -371,7 +371,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         if len(game.get_legal_moves()) == 0 or depth == 0:
             return (-1, -1)
         
-        def max_value(state, alpha, beta, depth):
+        def max_value(state, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
             
@@ -381,13 +381,13 @@ class AlphaBetaPlayer(IsolationPlayer):
             v = -infinity
             
             for move in state.get_legal_moves():
-                v = max(v, min_value(state.forecast_move(move), alpha, beta, depth - 1))
+                v = max(v, min_value(state.forecast_move(move), depth - 1, alpha, beta))
                 if v >= beta:
                     return v
                 alpha = max(alpha, v)
             return v
         
-        def min_value(state, alpha, beta, depth):
+        def min_value(state, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
             
@@ -397,7 +397,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             v = infinity
             
             for move in state.get_legal_moves():
-                v = min(v, max_value(state.forecast_move(move), alpha, beta, depth - 1))
+                v = min(v, max_value(state.forecast_move(move), depth - 1, alpha, beta))
                 if v <= alpha:
                     return v
                 beta = min(beta, v)
@@ -408,8 +408,17 @@ class AlphaBetaPlayer(IsolationPlayer):
         
         legal_moves = game.get_legal_moves()
         
-        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth - 1, alpha, beta))
+        best_score = -infinity
+        best_action = None
+        
+        for m in game.get_legal_moves():
+            score = min_value(game.forecast_move(m), depth - 1, alpha, beta )
+            if score > best_score:
+                best_action = m
+        
+        #return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth - 1, alpha, beta))
         
         #v = max_value(game, alpha, beta, depth - 1)
         # TODO: finish this function!
         # raise NotImplementedError
+        return best_action
