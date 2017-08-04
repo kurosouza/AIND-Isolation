@@ -312,7 +312,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         (int, int)
             Board coordinates corresponding to a legal move; may return
             (-1, -1) if there are no available legal moves.
-        """
+        """       
         self.time_left = time_left
 
         # TODO: finish this function!
@@ -365,6 +365,51 @@ class AlphaBetaPlayer(IsolationPlayer):
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-
+        
+        infinity = float("inf")
+        
+        if len(game.get_legal_moves()) == 0 or depth == 0:
+            return (-1, -1)
+        
+        def max_value(state, alpha, beta, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+            
+            if len(state.get_legal_moves()) == 0 or depth < 1:
+                return self.score(state, self)
+            
+            v = -infinity
+            
+            for move in state.get_legal_moves():
+                v = max(v, min_value(state.forecast_move(move), alpha, beta, depth - 1))
+                if v >= beta:
+                    return v
+                alpha = max(alpha, v)
+            return v
+        
+        def min_value(state, alpha, beta, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+            
+            if len(state.get_legal_moves()) == 0 or depth < 1:
+                return self.score(state, self)
+            
+            v = infinity
+            
+            for move in state.get_legal_moves():
+                v = min(v, max_value(state.forecast_move(move), alpha, beta, depth - 1))
+                if v <= alpha:
+                    return v
+                beta = min(beta, v)
+            return v
+        
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        
+        legal_moves = game.get_legal_moves()
+        
+        return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth - 1, alpha, beta))
+        
+        #v = max_value(game, alpha, beta, depth - 1)
         # TODO: finish this function!
-        raise NotImplementedError
+        # raise NotImplementedError
