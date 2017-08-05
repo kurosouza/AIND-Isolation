@@ -412,8 +412,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         best_action = None
         
         for m in game.get_legal_moves():
-            score = max_value(game.forecast_move(m), depth - 1, alpha, beta )
+            score = min_value(game.forecast_move(m), depth - 1, best_score, beta )
             if score > best_score:
+                best_score = score
                 best_action = m
         
         #return max(legal_moves, key = lambda a : min_value(game.forecast_move(a), depth - 1, alpha, beta))
